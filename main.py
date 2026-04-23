@@ -1,4 +1,5 @@
 import string
+from GameState import GameState
 
 alphabet = string.ascii_uppercase
 
@@ -6,8 +7,7 @@ alphabet = string.ascii_uppercase
 def main():
 
     while True:
-        board = [["0" for _ in range(8)] for _ in range(8)]  # empty board
-        prompt(board)
+        prompt()
         repeat = input("\nGo Again? (y for yes, anything else for no): ")
         if repeat != "y":
             print("Exiting...")
@@ -43,89 +43,57 @@ def is_first():
             print("Invalid Input. Try Again")
 
 
-def prompt(board: list[list[int]]):
+def prompt():
     processingTime = get_processing_time()
     goFirst = is_first()
+    state = GameState(goFirst)
     winner = None
     print()
-    printBoard(board)
+    state.printBoard()
     print()
     if not goFirst:
-        botMove(board)
-        winner = check_win(board)
+        botMove(state)
+        winner = state.check_win()
         print()
-        printBoard(board)
+        state.printBoard()
 
     while winner is None:
-        userMove(board)
-        winner = check_win(board)
+        userMove(state)
+        winner = state.check_win()
         if winner is not None:
             break
 
-        botMove(board)
-        winner = check_win(board)
+        botMove(state)
+        winner = state.check_win()
         print()
-        printBoard(board)
+        state.printBoard()
 
+    state.printBoard()
+    print()
     print(f"\nGame Over! The winner is {winner}!")
-    print()
-    printBoard(board)
 
 
-def userMove(board: list[list[int]]):
-    pos = ""
-    while len(pos) != 2:
-        pos = input("Choose your next move: ")
-    col = int(pos[-1])
-    row = pos[0]
-    converted_row = alphabet.index(row)
-    # print(col)
-    # print(converted_row)
-    board[converted_row][col - 1] = "O"
+def userMove(state: GameState):
+    while True:
+        pos = ""
+        while len(pos) != 2:
+            pos = input("Choose your next move (e.g., A1): ")
+
+        try:
+            col = int(pos[-1])
+            row = pos[0].upper()
+            converted_row = alphabet.index(row)
+
+            if state.make_move(converted_row, col - 1, "O"):
+                break
+            else:
+                print("That space is already taken! Try again.")
+        except (ValueError, IndexError):
+            print("Invalid input format or out of bounds. Try again.")
 
 
-def botMove(board: list[list[int]]):
+def botMove(state: GameState):
     pass
-
-
-def printBoard(board: list[list[int]]):
-    print("  ", end="")
-    for i in range(1, 9):
-        print(i, end=" ")
-    print()
-    for i, row in enumerate(board):
-        print(f"{alphabet[i]} ", end="")
-        for el in row:
-            print(el, end=" ") if el == "O" or el == "X" else print("-", end=" ")
-        print()
-
-
-def check_win(board: list[list[str]]) -> str | None:
-    # Check horizontal
-    for row in range(8):
-        for col in range(5):
-            if (
-                board[row][col] in ["O", "X"]
-                and board[row][col]
-                == board[row][col + 1]
-                == board[row][col + 2]
-                == board[row][col + 3]
-            ):
-                return board[row][col]
-
-    # Check vertical
-    for col in range(8):
-        for row in range(5):
-            if (
-                board[row][col] in ["O", "X"]
-                and board[row][col]
-                == board[row + 1][col]
-                == board[row + 2][col]
-                == board[row + 3][col]
-            ):
-                return board[row][col]
-
-    return None
 
 
 if __name__ == "__main__":
