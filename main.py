@@ -4,10 +4,9 @@ alphabet = string.ascii_uppercase
 
 
 def main():
-    board = [["0" for _ in range(8)] for _ in range(8)]  # test board
-    printBoard(board)
 
     while True:
+        board = [["0" for _ in range(8)] for _ in range(8)]  # empty board
         prompt(board)
         repeat = input("\nGo Again? (y for yes, anything else for no): ")
         if repeat != "y":
@@ -47,17 +46,30 @@ def is_first():
 def prompt(board: list[list[int]]):
     processingTime = get_processing_time()
     goFirst = is_first()
+    winner = None
     print()
     printBoard(board)
     print()
     if not goFirst:
-        board = botMove()
-    userMove(board)  # check if game ends here and loop
-    botMove(board)
+        botMove(board)
+        winner = check_win(board)
+        print()
+        printBoard(board)
+
+    while winner is None:
+        userMove(board)
+        winner = check_win(board)
+        if winner is not None:
+            break
+
+        botMove(board)
+        winner = check_win(board)
+        print()
+        printBoard(board)
+
+    print(f"\nGame Over! The winner is {winner}!")
     print()
     printBoard(board)
-
-    return processingTime, goFirst
 
 
 def userMove(board: list[list[int]]):
@@ -67,8 +79,8 @@ def userMove(board: list[list[int]]):
     col = int(pos[-1])
     row = pos[0]
     converted_row = alphabet.index(row)
-    print(col)
-    print(converted_row)
+    # print(col)
+    # print(converted_row)
     board[converted_row][col - 1] = "O"
 
 
@@ -86,6 +98,34 @@ def printBoard(board: list[list[int]]):
         for el in row:
             print(el, end=" ") if el == "O" or el == "X" else print("-", end=" ")
         print()
+
+
+def check_win(board: list[list[str]]) -> str | None:
+    # Check horizontal
+    for row in range(8):
+        for col in range(5):
+            if (
+                board[row][col] in ["O", "X"]
+                and board[row][col]
+                == board[row][col + 1]
+                == board[row][col + 2]
+                == board[row][col + 3]
+            ):
+                return board[row][col]
+
+    # Check vertical
+    for col in range(8):
+        for row in range(5):
+            if (
+                board[row][col] in ["O", "X"]
+                and board[row][col]
+                == board[row + 1][col]
+                == board[row + 2][col]
+                == board[row + 3][col]
+            ):
+                return board[row][col]
+
+    return None
 
 
 if __name__ == "__main__":
