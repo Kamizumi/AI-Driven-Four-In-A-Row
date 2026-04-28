@@ -65,7 +65,7 @@ class GameState:
         new_state.current_turn = self.current_turn
         return new_state
         
-    def is_terminal(self):
+    def get_valid_moves(self):
         '''
         Returns all valid moves
         '''
@@ -75,6 +75,12 @@ class GameState:
                 if self.board[r][c] == "0":
                     valid_moves.append((r,c))
         return valid_moves
+    
+    def is_terminal(self):
+        '''
+        Checks to see if game is over (either by victory or no more moves can be made)
+        '''
+        return self.check_win() is not None or len(self.get_valid_moves == 0)
         
     def count_pieces_in_middle(self, piece):
         '''
@@ -126,7 +132,7 @@ class GameState:
             score += self.count_streak("X", 3, dr, dc) * 1000
             score -= self.count_streak("O", 3, dr, dc) * 1000
 
-            #Horizontal streak of 2 is a setup but still a bit worrying
+            #Streak of 2 is a setup but still a bit worrying
             score += self.count_streak("X", 2, dr, dc) * 10
             score -= self.count_streak("O", 2, dr, dc) * 10
 
