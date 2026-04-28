@@ -55,70 +55,70 @@ class GameState:
 
         return None
 
-        def copy(self):
-            '''
-            Creates a deep copy of the board for the AI 
-            '''
-            new_state = GameState()
-            new_state.board = copy.deepcopy(self.board)
-            new_state.current_turn = self.current_turn
-            return new_state
+    def copy(self):
+        '''
+        Creates a deep copy of the board for the AI 
+        '''
+        new_state = GameState()
+        new_state.board = copy.deepcopy(self.board)
+        new_state.current_turn = self.current_turn
+        return new_state
         
-        def is_terminal(self):
-            '''
-            Returns all valid moves
-            '''
-            valid_moves = []
-            for r in range(8):
-                for c in range(8):
-                    if self.board[r][c] == "0":
-                        valid_moves.append((r,c))
-            return valid_moves
+    def is_terminal(self):
+        '''
+        Returns all valid moves
+        '''
+        valid_moves = []
+        for r in range(8):
+            for c in range(8):
+                if self.board[r][c] == "0":
+                    valid_moves.append((r,c))
+        return valid_moves
         
-        def count_pieces_in_middle(self, piece):
-            '''
-            For evaluation purposes; Checks to see how many pieces are in columns 4 and 5 (3 and 4 based on index 0)
-            '''
-            count = 0
-            mid_cols = [3,4]
-            for row in range(8):
-                for col in mid_cols:
-                    if self.board[row][col] == piece:
-                        count += 1
-            return count
+    def count_pieces_in_middle(self, piece):
+        '''
+        For evaluation purposes; Checks to see how many pieces are in columns 4 and 5 (3 and 4 based on index 0)
+        '''
+        count = 0
+        mid_cols = [3,4]
+        for row in range(8):
+            for col in mid_cols:
+                if self.board[row][col] == piece:
+                    count += 1
+        return count
         
-        def horizontal_streak(self, piece, length):
-            '''
-            For evaluation purposes; 3 in a row is an imminent threat VS 2 in a row is setting up, etc.
-            '''
-            count = 0
-            for row in range(8):
-                for col in range(8):
-                    if all(self.board[row][col + i] == piece for i in range(length)):
-                        count += 1
-            return count
+    def horizontal_streak(self, piece, length):
+        '''
+        For evaluation purposes; 3 in a row is an imminent threat VS 2 in a row is setting up, etc.
+        '''
+        count = 0
+        for row in range(8):
+            for col in range(8):
+                if all(self.board[row][col + i] == piece for i in range(length)):
+                    count += 1
+        return count
         
-        def evaluate(self, board):
-            result = self.check_win()
+    def evaluate(self, board):
+        result = self.check_win()
 
-            if result == "X": return 10000
-            if result == "O": return -10000
+        if result == "X": return 10000
+        if result == "O": return -10000
 
-            score = 0
+        score = 0
 
-            #Uses horizontal streak of 3 poses an imminent threat to victory
-            score += self.horizontal_streak("X", 3) * 1000
-            score -= self.horizontal_streak("O", 3) * 1000
+        #Uses horizontal streak of 3 poses an imminent threat to victory
+        score += self.horizontal_streak("X", 3) * 1000
+        score -= self.horizontal_streak("O", 3) * 1000
 
-            #Horizontal streak of 2 is a setup but still a bit worrying
-            score += self.horizontal_streak("X", 2) * 10
-            score -= self.horizontal_streak("O", 2) * 10
+        #Horizontal streak of 2 is a setup but still a bit worrying
+        score += self.horizontal_streak("X", 2) * 10
+        score -= self.horizontal_streak("O", 2) * 10
 
-            #Spots in the middle columns because they provide more value
-            score += self.count_pieces_in_middle("X") * 10
-            score -= self.count_pieces_in_middle("O") * 10
+        #Spots in the middle columns because they provide more value
+        score += self.count_pieces_in_middle("X") * 10
+        score -= self.count_pieces_in_middle("O") * 10
 
-            return score
+        return score
 
 
 
