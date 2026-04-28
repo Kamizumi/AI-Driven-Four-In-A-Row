@@ -1,5 +1,6 @@
 from itertools import count
 import string
+import copy
 
 alphabet = string.ascii_uppercase
 
@@ -87,15 +88,28 @@ class GameState:
                     count += 1
         return count
         
-    def horizontal_streak(self, piece, length):
+    def count_streak(self, piece, length, dr, dc):
         '''
         For evaluation purposes; 3 in a row is an imminent threat VS 2 in a row is setting up, etc.
+        Counts the occurences of a piece in a streak of the given length along a direction defined by (dr,dc)
+        dr will be given as (0, 1) ; row direction
+        dc will be given as (1,0) ; column direction
+
+        Example:
+        Streak of 3 vertically
+        dr = 1, dc = 0 ; so only the row moves and column stays the same
+        count_streak("X", 3, 1, 0)
+
+        Streak of 3 horizontally
+        dr = 0, dc = 1 ; so only the column moves and the row stays the same
+        count_streak("X", 3, 0, 1)
         '''
         count = 0
         for row in range(8):
             for col in range(8):
-                if all(self.board[row][col + i] == piece for i in range(length)):
-                    count += 1
+                if( 0 <= row + (length - 1) * dr) < 8 and (0 <= col + (length - 1) * dc < 8 ):
+                    if all(self.board[row + i * dr][col + i * dc] == piece for i in range(length)):
+                        count += 1
         return count
         
     def evaluate(self, board):
@@ -106,13 +120,15 @@ class GameState:
 
         score = 0
 
-        #Uses horizontal streak of 3 poses an imminent threat to victory
-        score += self.horizontal_streak("X", 3) * 1000
-        score -= self.horizontal_streak("O", 3) * 1000
+        directions = [[1,0], [0,1]]
+        #Checks streaks of 3 in horizontal and vertical directions
+        for dr, dc in directions:
+            score += self.count_streak("X", 3, dr, dc) * 1000
+            score -= self.count_streak("O", 3, dr, dc) * 1000
 
-        #Horizontal streak of 2 is a setup but still a bit worrying
-        score += self.horizontal_streak("X", 2) * 10
-        score -= self.horizontal_streak("O", 2) * 10
+            #Horizontal streak of 2 is a setup but still a bit worrying
+            score += self.count_streak("X", 2, dr, dc) * 10
+            score -= self.count_streak("O", 2, dr, dc) * 10
 
         #Spots in the middle columns because they provide more value
         score += self.count_pieces_in_middle("X") * 10
