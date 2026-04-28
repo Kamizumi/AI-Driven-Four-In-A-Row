@@ -14,7 +14,7 @@ def minimax(state, depth, alpha, beta, maximizing_player, start_time, time_limit
         raise SearchTimeout()
     
     if depth == 0 or state.is_terminal():
-        return state.evaluate_board()
+        return state.evaluate()
 
     if maximizing_player:
         max_eval = float('-inf')
