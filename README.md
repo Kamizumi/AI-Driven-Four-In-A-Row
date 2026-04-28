@@ -1,4 +1,4 @@
-# Connect 4 Bot (without diagonals) for CS4200
+# Connect 4 Bot (without diagonals)
 
 ### Team Members
 - Joshua Estrada
