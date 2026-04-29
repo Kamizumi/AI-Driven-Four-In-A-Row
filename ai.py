@@ -48,7 +48,7 @@ def get_best_move(state: GameState, time_limit: float):
 
 
 def ordered_moves(state: GameState):
-    moves = state.get_valid_locations()
+    moves = state.get_valid_moves()
     center = 3.5
     return sorted(moves, key=lambda move: abs(move[0] - center) + abs(move[1] - center))
 
