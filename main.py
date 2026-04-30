@@ -1,5 +1,6 @@
 import string
 from GameState import GameState
+from ai import get_best_move
 
 alphabet = string.ascii_uppercase
 
@@ -52,7 +53,7 @@ def prompt():
     state.printBoard()
     print()
     if not goFirst:
-        botMove(state)
+        botMove(state, processingTime)
         winner = state.check_win()
         print()
         state.printBoard()
@@ -63,7 +64,7 @@ def prompt():
         if winner is not None:
             break
 
-        botMove(state)
+        botMove(state, processingTime)
         winner = state.check_win()
         print()
         state.printBoard()
@@ -92,8 +93,12 @@ def userMove(state: GameState):
             print("Invalid input format or out of bounds. Try again.")
 
 
-def botMove(state: GameState):
-    pass
+def botMove(state: GameState, processingTime):
+    move = get_best_move(state, processingTime)
+    if move is None:
+        return
+
+    state.make_move(move[0], move[1], state.current_turn)
 
 
 if __name__ == "__main__":

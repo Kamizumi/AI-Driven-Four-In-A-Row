@@ -80,7 +80,7 @@ class GameState:
         '''
         Checks to see if game is over (either by victory or no more moves can be made)
         '''
-        return self.check_win() is not None or len(self.get_valid_moves == 0)
+        return self.check_win() is not None or len(self.get_valid_moves()) == 0
         
     def count_pieces_in_middle(self, piece):
         '''
@@ -113,12 +113,14 @@ class GameState:
         count = 0
         for row in range(8):
             for col in range(8):
-                if( 0 <= row + (length - 1) * dr) < 8 and (0 <= col + (length - 1) * dc < 8 ):
+                end_row = row + (length - 1) * dr
+                end_col = col + (length - 1) * dc
+                if 0 <= end_row < 8 and 0 <= end_col < 8:
                     if all(self.board[row + i * dr][col + i * dc] == piece for i in range(length)):
                         count += 1
         return count
         
-    def evaluate(self, board):
+    def evaluate(self):
         result = self.check_win()
 
         if result == "X": return 10000
